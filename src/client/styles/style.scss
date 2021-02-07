@@ -1,0 +1,17 @@
+@import './header';
+@import './thought-input';
+@import './buttons';
+@import './thoughts-table';
+
+* {
+  box-sizing: border-box;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+
+.content {
+  & > div {
+    margin-bottom: 64px;
+  }
+}
+
+
