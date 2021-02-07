@@ -1,3 +1,5 @@
-# Capstone Travel App: Udacity Project
+# Thoughts app
 
-This is the fifth and final project in the Front End Development Nano Degree on Udacity. It project was made using Webpack and Express and the list of dependencies can be found in the package.json folder. The project includes API calls and the correct management and display of the data that come back from them.
+This is a small app to practice client-server communication as well as responsive design.
+Its features include storing arbitrary "thought" strings on the server, displaying all previous ones in a table,
+editing and deleting them.
