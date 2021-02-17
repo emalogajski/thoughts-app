@@ -11,7 +11,6 @@ const addThought = (req, res) => {
   thoughtsArray.push(thoughtObj);
   res.json(thoughtObj);
 }
-
 const getThoughts = (_, res) => {
   res.send(thoughtsArray);
 }
