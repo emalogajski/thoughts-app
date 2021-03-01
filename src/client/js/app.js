@@ -44,11 +44,15 @@ const addNewRow = () => {
 }
 
 const addNewCell = (item) => {
-  for(const property in item) {
-    newCell = document.createElement('td');
-    newCell.innerHTML = `${item[property]}`;
-    newThoughtRow.append(newCell);
-  }
+  Object.keys(item).sort().reverse().forEach(key => {
+    if(key !== 'id') {
+      newCell = document.createElement('td');
+      newCell.innerHTML = `${item[key]}`;
+      newThoughtRow.append(newCell);
+    } else {
+      return;
+    }
+  })
 }
 
 
