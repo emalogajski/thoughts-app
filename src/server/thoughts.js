@@ -1,4 +1,4 @@
-let thoughtsArray = [{thought: 'hello', timestamp: 'today', id: '3'}];
+let thoughtsArray = [{timestamp: 'today', id: '3', thought: 'hello'}];
 
 const findThought = (id) => thoughtsArray.find((item) => item.id === id);
 

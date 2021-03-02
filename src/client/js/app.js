@@ -5,9 +5,9 @@ const basePath = 'http://localhost:3000';
 
 let newThoughtRow;
 let newCell;
-let bodyOfTable;
-let newTableBody;
-
+let TableBody;
+let currentRows;
+let td;
 
 const init = () => {
   
@@ -15,13 +15,11 @@ const init = () => {
     newThoughtRow = document.createElement('tr');
     try {
       const response = await axios.get(`${basePath}/thoughts`);
-      console.log(response.data);
-      removeCurrentThoughtBody();
+      emptyTable();
       response.data.forEach(item => {
         addNewRow(),
         addNewCell(item);
       })
-      // console.log(newTableBody); works!!
     } catch (err) {
       console.error(err);
     }
@@ -31,28 +29,47 @@ const init = () => {
 
 window.onload = init;
 
-const removeCurrentThoughtBody = () => {
-  bodyOfTable = document.getElementById('table-body');
-  newTableBody = document.createElement('tbody');
-  bodyOfTable.parentNode.replaceChild(newTableBody, bodyOfTable);
+const emptyTable = () => {
+  currentRows = document.getElementsByClassName('thought-row');
+  for(let i = 0; i < currentRows.length; i++) {
+    currentRows[i].innerHTML = '';
+  }
+}
+
+const createActionCell = (element) => {
+  td = document.createElement('td');
+
+  //create span that holds Trash symbol and attach to cell
+  const spanTrash = document.createElement('span');
+  const iTrash = document.createElement('i');
+  spanTrash.appendChild(iTrash);
+  spanTrash.classList.add('icon-button', 'danger');
+  iTrash.classList.add('fas', 'fa-trash');
+  td.appendChild(spanTrash);
+
+  //create span that holds Edit symbol and attach to cell
+  const spanEdit = document.createElement('span');
+  spanEdit.classList.add('icon-button', 'info');
+  const iEdit = document.createElement('i');
+  iEdit.classList.add('fas', 'fa-edit');
+  spanEdit.appendChild(iEdit);
+  td.appendChild(spanEdit);
+  element.append(td);
 }
 
 const addNewRow = () => {
-  newThoughtRow.classList.add('thought-row');
-  newTableBody.append(newThoughtRow);
-  // console.log(newTableBody); works!!
+  TableBody = document.getElementById('table-body');
+  TableBody.append(newThoughtRow);
 }
 
 const addNewCell = (item) => {
-  Object.keys(item).sort().reverse().forEach(key => {
-    if(key !== 'id') {
-      newCell = document.createElement('td');
-      newCell.innerHTML = `${item[key]}`;
-      newThoughtRow.append(newCell);
-    } else {
-      return;
-    }
+  const arrayOfNeededItems = Object.keys(item).filter(key => key === 'thought' || key === 'timestamp').sort().reverse();
+  arrayOfNeededItems.forEach(element => {
+    newCell = document.createElement('td');
+    newCell.innerHTML = `${item[element]}`;
+    newThoughtRow.append(newCell);
   })
+  createActionCell(newThoughtRow);
 }
 
 
