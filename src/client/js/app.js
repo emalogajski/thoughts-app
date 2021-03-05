@@ -8,11 +8,13 @@ let newCell;
 let TableBody;
 let currentRows;
 let td;
+let textArea;
 
 const init = () => {
   
   const fetchThoughts = async () => {
     newThoughtRow = document.createElement('tr');
+    textArea = document.getElementById('textarea');
     try {
       const response = await axios.get(`${basePath}/thoughts`);
       emptyTable();
@@ -25,6 +27,7 @@ const init = () => {
     }
   };
   fetchThoughts();
+  textArea.addEventListener('keyup', countCharacters);
 }
 
 window.onload = init;
@@ -101,6 +104,15 @@ const addNewCell = (item) => {
   }
   createActionCell(newThoughtRow);
 }
+
+const countCharacters = () => {
+  const characterCounter = document.getElementById('current');
+  const liveCharacterCount = textArea.value.length;
+  characterCounter.innerHTML = `${liveCharacterCount}`;
+}
+
+
+
 
 // const displayThoughts = () => {
 //   thoughtTextareaInput = document.getElementsByTagName('textarea').value;

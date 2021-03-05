@@ -20,11 +20,11 @@
             <div class="content">
                 <div class="row">
                     <div class="thought-input-wrapper">
-                        <textarea class="form-control thought-input" name="thoughts" rows="3"></textarea>
+                        <textarea id="textarea" class="form-control thought-input" name="thoughts" rows="3" maxlength="280"></textarea>
                         <div class="button-row">
                             <button disabled type="reset" class="btn btn-danger" id="clearInput">Clear</button>
                             <div class="characters-counter">
-                                <span class="current">X</span>
+                                <span id="current" class="current">X</span>
                                 / 280
                             </div>
                             <button type="submit" class="btn btn-primary" id="submitInput">Submit</button>
