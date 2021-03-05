@@ -64,14 +64,43 @@ const addNewRow = () => {
 
 const addNewCell = (item) => {
   const arrayOfNeededItems = Object.keys(item).filter(key => key === 'thought' || key === 'timestamp').sort().reverse();
-  arrayOfNeededItems.forEach(element => {
-    newCell = document.createElement('td');
-    newCell.innerHTML = `${item[element]}`;
-    newThoughtRow.append(newCell);
-  })
+  const dateFormat = `${new Date().getDate()}/${new Date().getMonth() + 1}/${new Date().getFullYear()}`;
+  item['timestamp'] = dateFormat;
+  if(arrayOfNeededItems.length === 2) {
+    arrayOfNeededItems.forEach(element => {
+      newCell = document.createElement('td');
+      newCell.innerHTML = `${item[element]}`;
+      newThoughtRow.append(newCell);
+    })
+  } else if(arrayOfNeededItems[0] !== 'timestamp') {
+    arrayOfNeededItems.splice(0, 0, 'placeholder')
+    arrayOfNeededItems.forEach(element => {
+      if(item[element]) {
+        newCell = document.createElement('td');
+        newCell.innerHTML = `${item[element]}`;
+        newThoughtRow.append(newCell);
+      } else {
+        newCell = document.createElement('td');
+        newCell.innerHTML = `${dateFormat}`;
+        newThoughtRow.append(newCell);
+      }
+    })
+  } else if (arrayOfNeededItems[0] === 'timestamp') {
+    arrayOfNeededItems.splice(1, 0, 'placeholder')
+    arrayOfNeededItems.forEach(element => {
+      if(item[element]) {
+        newCell = document.createElement('td');
+        newCell.innerHTML = `${item[element]}`;
+        newThoughtRow.append(newCell);
+      } else {
+        newCell = document.createElement('td');
+        newCell.innerHTML = '';
+        newThoughtRow.append(newCell);
+      }
+    })
+  }
   createActionCell(newThoughtRow);
 }
-
 
 // const displayThoughts = () => {
 //   thoughtTextareaInput = document.getElementsByTagName('textarea').value;
