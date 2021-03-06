@@ -1,4 +1,20 @@
-let thoughtsArray = [];
+let thoughtsArray = [
+  {
+    id: 1,
+    thought: "Are aliens real?",
+    timestamp: 86400000
+  },
+  {
+    id: 2,
+    thought: "When will Corona be over?!?!?!?! DAMNIT!!!!",
+    timestamp: 1615042530000
+  },
+  {
+    id: 3,
+    thought: "...",
+    timestamp: 1614022530000
+  }
+];
 
 const findThought = (id) => thoughtsArray.find((item) => item.id === id);
 
