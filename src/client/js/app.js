@@ -3,24 +3,22 @@ dotenv.config();
 const axios = require('axios');
 const basePath = 'http://localhost:3000';
 
-let newThoughtRow;
 let newCell;
-let TableBody;
-let currentRows;
+let tableBody;
 let td;
 let textArea;
 
 const init = () => {
   
   const fetchThoughts = async () => {
-    newThoughtRow = document.createElement('tr');
+    tableBody = document.getElementById('table-body');
     textArea = document.getElementById('textarea');
     try {
       const response = await axios.get(`${basePath}/thoughts`);
-      emptyTable();
+      tableBody.innerHTML = '';
       response.data.forEach(item => {
-        addNewRow(),
-        addNewCell(item);
+        const row = addNewRow();
+        addNewCell(row, item);
       })
     } catch (err) {
       console.error(err);
@@ -31,13 +29,6 @@ const init = () => {
 }
 
 window.onload = init;
-
-const emptyTable = () => {
-  currentRows = document.getElementsByClassName('thought-row');
-  for(let i = 0; i < currentRows.length; i++) {
-    currentRows[i].innerHTML = '';
-  }
-}
 
 const createActionCell = (element) => {
   td = document.createElement('td');
@@ -61,13 +52,16 @@ const createActionCell = (element) => {
 }
 
 const addNewRow = () => {
-  TableBody = document.getElementById('table-body');
-  TableBody.append(newThoughtRow);
+  const row = document.createElement('tr');
+  tableBody.append(row);
+  return row;
 }
 
-const addNewCell = (item) => {
+const addNewCell = (newThoughtRow,item) => {
   const arrayOfNeededItems = Object.keys(item).filter(key => key === 'thought' || key === 'timestamp').sort().reverse();
-  const dateFormat = `${new Date().getDate()}/${new Date().getMonth() + 1}/${new Date().getFullYear()}`;
+  const timestampValueNumber = parseInt(item['timestamp']);
+  const newDate = new Date(timestampValueNumber);
+  const dateFormat = `${newDate.getDate()}/${newDate.getMonth() + 1}/${newDate.getFullYear()}`;
   item['timestamp'] = dateFormat;
   if(arrayOfNeededItems.length === 2) {
     arrayOfNeededItems.forEach(element => {
@@ -84,7 +78,7 @@ const addNewCell = (item) => {
         newThoughtRow.append(newCell);
       } else {
         newCell = document.createElement('td');
-        newCell.innerHTML = `${dateFormat}`;
+        newCell.innerHTML = dateFormat;
         newThoughtRow.append(newCell);
       }
     })
