@@ -2,17 +2,19 @@ const dotenv = require('dotenv');
 dotenv.config();
 const axios = require('axios');
 const basePath = 'http://localhost:3000';
+const clearButton = document.getElementById('clearInput');
+const submitButton = document.getElementById('submitInput');
+const characterCounter = document.getElementById('current');
+const textArea = document.getElementById('textarea');
+const tableBody = document.getElementById('table-body');
+
 
 let newCell;
-let tableBody;
 let td;
-let textArea;
 
 const init = () => {
   
   const fetchThoughts = async () => {
-    tableBody = document.getElementById('table-body');
-    textArea = document.getElementById('textarea');
     try {
       const response = await axios.get(`${basePath}/thoughts`);
       tableBody.innerHTML = '';
@@ -24,8 +26,35 @@ const init = () => {
       console.error(err);
     }
   };
+
+  const saveThought = async (thought) => {
+    try {
+      await axios.post(`${basePath}/thoughts`, {thought});
+      clearText();
+      const amountOfCharacters = countCharacters();
+      updateCharacterCount(amountOfCharacters);
+      enableDisableButtons(amountOfCharacters);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   fetchThoughts();
-  textArea.addEventListener('keyup', countCharacters);
+  textArea.addEventListener('keyup', () => {
+    const amountOfCharacters = countCharacters();
+    updateCharacterCount(amountOfCharacters);
+    enableDisableButtons(amountOfCharacters);
+  });
+
+  clearButton.addEventListener('click', () => {
+    clearText();
+    const amountOfCharacters = countCharacters();
+    updateCharacterCount(amountOfCharacters);
+    enableDisableButtons(amountOfCharacters);
+  });
+
+  submitButton.addEventListener('click', () => saveThought(textArea.value));
+
 }
 
 window.onload = init;
@@ -100,21 +129,22 @@ const addNewCell = (newThoughtRow,item) => {
 }
 
 const countCharacters = () => {
-  const characterCounter = document.getElementById('current');
-  const liveCharacterCount = textArea.value.length;
-  characterCounter.innerHTML = `${liveCharacterCount}`;
+  return textArea.value.length;
+}
+
+const updateCharacterCount = (amountOfCharacters) => {
+  characterCounter.innerHTML = amountOfCharacters;
+}
+
+const enableDisableButtons = (amountOfCharacters) => {
+  const charactersPresent = amountOfCharacters > 0;
+  clearButton.disabled = !charactersPresent;
+  submitButton.disabled = !charactersPresent;
+}
+
+const clearText = () => {
+  textArea.value = '';
+  textArea.value.length = 0;
 }
 
 
-
-
-// const displayThoughts = () => {
-//   thoughtTextareaInput = document.getElementsByTagName('textarea').value;
-//   submitButton = document.getElementById('submitInput');
-//   submitButton.addEventListener('onclick', () => {
-//     if(thoughtTextareaInput.length !== 0) {
-//       removeCurrentThoughtRows();
-
-//     }
-//   })
-// }
