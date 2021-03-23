@@ -7,57 +7,35 @@ const submitButton = document.getElementById('submitInput');
 const characterCounter = document.getElementById('current');
 const textArea = document.getElementById('textarea');
 const tableBody = document.getElementById('table-body');
-
+const sortDateButton = document.getElementById('sort-date-button');
 
 let newCell;
 let td;
 
-const init = () => {
-  
-  const fetchThoughts = async () => {
-    try {
-      const response = await axios.get(`${basePath}/thoughts`);
-      tableBody.innerHTML = '';
-      response.data.forEach(item => {
-        const row = addNewRow();
-        addNewCell(row, item);
-      })
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const saveThought = async (thought) => {
-    try {
-      await axios.post(`${basePath}/thoughts`, {thought});
-      clearText();
-      const amountOfCharacters = countCharacters();
-      updateCharacterCount(amountOfCharacters);
-      enableDisableButtons(amountOfCharacters);
-    } catch (err) {
-      console.error(err);
-    }
+const fetchThoughts = async () => {
+  try {
+    const response = await axios.get(`${basePath}/thoughts`);
+    tableBody.innerHTML = '';
+    response.data.forEach(item => {
+      const row = addNewRow();
+      addNewCell(row, item);
+    })
+  } catch (err) {
+    console.error(err);
   }
+};
 
-  fetchThoughts();
-  textArea.addEventListener('keyup', () => {
-    const amountOfCharacters = countCharacters();
-    updateCharacterCount(amountOfCharacters);
-    enableDisableButtons(amountOfCharacters);
-  });
-
-  clearButton.addEventListener('click', () => {
+const saveThought = async (thought) => {
+  try {
+    await axios.post(`${basePath}/thoughts`, {thought});
     clearText();
     const amountOfCharacters = countCharacters();
     updateCharacterCount(amountOfCharacters);
     enableDisableButtons(amountOfCharacters);
-  });
-
-  submitButton.addEventListener('click', () => saveThought(textArea.value));
-
+  } catch (err) {
+    console.error(err);
+  }
 }
-
-window.onload = init;
 
 const createActionCell = (element) => {
   td = document.createElement('td');
@@ -147,4 +125,49 @@ const clearText = () => {
   textArea.value.length = 0;
 }
 
+const sortByDate = async () => {
+  const arrayOfDateKeys = [];
+  const arrayOfObjectsSortedByDate = [];
+  try {
+    const response = await axios.get(`${basePath}/thoughts`);
+    response.data.map(item => {
+      const dateKey = Object.keys(item).filter(key => key === 'timestamp').map(key => item[key]);
+      const dateKeyFormatted = parseInt(dateKey);
+      arrayOfDateKeys.push(dateKeyFormatted);
+      const arrayOfDateKeysSorted = arrayOfDateKeys.sort();
+      arrayOfObjectsSortedByDate.push(item[arrayOfDateKeysSorted]);
+    })
+  } catch (err) {
+    console.error(err);
+  }
+  // const arrayOfDateKeysSorted = arrayOfDateKeys.sort();
+  // arrayOfObjectsSortedByDate.push(item[arrayOfObjectsSortedByDate]);
+  console.log(arrayOfObjectsSortedByDate);  
+}
 
+const init = () => {
+  
+  fetchThoughts();
+  textArea.addEventListener('keyup', () => {
+    const amountOfCharacters = countCharacters();
+    updateCharacterCount(amountOfCharacters);
+    enableDisableButtons(amountOfCharacters);
+  });
+
+  clearButton.addEventListener('click', () => {
+    clearText();
+    const amountOfCharacters = countCharacters();
+    updateCharacterCount(amountOfCharacters);
+    enableDisableButtons(amountOfCharacters);
+  });
+
+  submitButton.addEventListener('click', () => saveThought(textArea.value));
+  sortDateButton.addEventListener('click', 
+  // () => {
+    sortByDate);
+    // tableBody.innerHTML = '';
+
+  // });
+}
+
+window.onload = init;
