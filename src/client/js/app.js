@@ -7,28 +7,51 @@ let newCell;
 let tableBody;
 let td;
 let textArea;
+const thoughtObjects = [];
 
+const fetchThoughts = async () => {
+  newThoughtRow = document.createElement('tr');
+  try {
+    const response = await axios.get(`${basePath}/thoughts`);
+    
+    thoughtObjects.length = 0;
+    thoughtObjects.push(...response.data)
+    renderTable()
+  } catch (err) {
+    console.error(err);
+  }
+};
 const init = () => {
-  
-  const fetchThoughts = async () => {
-    tableBody = document.getElementById('table-body');
-    textArea = document.getElementById('textarea');
-    try {
-      const response = await axios.get(`${basePath}/thoughts`);
-      tableBody.innerHTML = '';
-      response.data.forEach(item => {
-        const row = addNewRow();
-        addNewCell(row, item);
-      })
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  textArea = document.getElementById("textarea");
   fetchThoughts();
+  document.getElementById("submitInput").addEventListener("click", onSubmit);
   textArea.addEventListener('keyup', countCharacters);
 }
 
 window.onload = init;
+
+const renderTable = () => {
+  emptyTable();
+  thoughtObjects.forEach(item => {
+    addNewRow(),
+    addNewCell(item);
+  });
+}
+
+const onSubmit = async () => {
+  const thought = textArea.value;
+
+  const newThought = await axios.post(`${basePath}/thoughts`, {thought});
+  thoughtObjects.unshift(newThought)
+  renderTable();
+}
+
+const emptyTable = () => {
+  currentRows = document.getElementsByClassName('thought-row');
+  for(let i = 0; i < currentRows.length; i++) {
+    currentRows[i].innerHTML = '';
+  }
+}
 
 const createActionCell = (element) => {
   td = document.createElement('td');
