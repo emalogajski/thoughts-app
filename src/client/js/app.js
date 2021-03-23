@@ -7,13 +7,10 @@ const submitButton = document.getElementById('submitInput');
 const characterCounter = document.getElementById('current');
 const textArea = document.getElementById('textarea');
 const tableBody = document.getElementById('table-body');
-<<<<<<< HEAD
 
-=======
 const sortDateButton = document.getElementById('sort-date-button');
 
 let newCell;
->>>>>>> wip table sort
 let td;
 let textArea;
 const thoughtObjects = [];
@@ -31,7 +28,6 @@ const fetchThoughts = async () => {
   }
 };
 
-<<<<<<< HEAD
 const init = () => {
   textArea = document.getElementById("textarea");
   tableBody = document.getElementById("table-body");
@@ -51,7 +47,6 @@ const init = () => {
     } catch (err) {
       console.error(err);
     }
-=======
 const fetchThoughts = async () => {
   try {
     const response = await axios.get(`${basePath}/thoughts`);
@@ -62,11 +57,9 @@ const fetchThoughts = async () => {
     })
   } catch (err) {
     console.error(err);
->>>>>>> wip table sort
   }
 };
 
-<<<<<<< HEAD
 }
 
 window.onload = init;
@@ -97,7 +90,6 @@ const emptyTable = () => {
 }
 
 const createActionCell = (row) => {
-=======
 const saveThought = async (thought) => {
   try {
     await axios.post(`${basePath}/thoughts`, {thought});
@@ -111,7 +103,6 @@ const saveThought = async (thought) => {
 }
 
 const createActionCell = (element) => {
->>>>>>> wip table sort
   td = document.createElement('td');
 
   //create span that holds Trash symbol and attach to cell
