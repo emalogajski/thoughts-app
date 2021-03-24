@@ -7,40 +7,75 @@ const submitButton = document.getElementById('submitInput');
 const characterCounter = document.getElementById('current');
 const textArea = document.getElementById('textarea');
 const tableBody = document.getElementById('table-body');
-const sortDateButton = document.getElementById('sort-date-button');
 
-let newCell;
 let td;
+let textArea;
 const thoughtObjects = [];
 
 const fetchThoughts = async () => {
+
   try {
     const response = await axios.get(`${basePath}/thoughts`);
+    
     thoughtObjects.length = 0;
-    thoughtObjects.push(...response.data);
-    tableBody.innerHTML = '';
-    response.data.forEach(item => {
-      const row = addNewRow();
-      addNewCell(row, item);
-    })
+    thoughtObjects.push(...response.data)
+    renderTable()
   } catch (err) {
     console.error(err);
   }
 };
 
-const saveThought = async (thought) => {
-  try {
-    await axios.post(`${basePath}/thoughts`, {thought});
-    clearText();
-    const amountOfCharacters = countCharacters();
-    updateCharacterCount(amountOfCharacters);
-    enableDisableButtons(amountOfCharacters);
-  } catch (err) {
-    console.error(err);
+const init = () => {
+  textArea = document.getElementById("textarea");
+  tableBody = document.getElementById("table-body");
+  fetchThoughts();
+  document.getElementById("submitInput").addEventListener("click", onSubmit);
+  document.getElementById("clearInput").addEventListener("click", onClear);
+
+  textArea.addEventListener('keyup', countCharacters);
+  
+  const saveThought = async (thought) => {
+    try {
+      await axios.post(`${basePath}/thoughts`, {thought});
+      clearText();
+      const amountOfCharacters = countCharacters();
+      updateCharacterCount(amountOfCharacters);
+      enableDisableButtons(amountOfCharacters);
+    } catch (err) {
+      console.error(err);
+    }
   }
+
 }
 
-const createActionCell = (element) => {
+window.onload = init;
+
+const renderTable = () => {
+  emptyTable();
+  thoughtObjects.forEach(item => {
+    const row = addNewRow();
+    addNewCell(row,item);
+  });
+}
+
+const onClear = () => {
+  textArea.value = "";
+}
+
+const onSubmit = async () => {
+  const thought = textArea.value;
+
+  const {data: newThought} = await axios.post(`${basePath}/thoughts`, {thought});
+  onClear();
+  thoughtObjects.unshift(newThought)
+  renderTable();
+}
+
+const emptyTable = () => {
+  tableBody.innerHTML = "";
+}
+
+const createActionCell = (row) => {
   td = document.createElement('td');
 
   //create span that holds Trash symbol and attach to cell
@@ -58,7 +93,7 @@ const createActionCell = (element) => {
   iEdit.classList.add('fas', 'fa-edit');
   spanEdit.appendChild(iEdit);
   td.appendChild(spanEdit);
-  element.append(td);
+  row.append(td);
 }
 
 const addNewRow = () => {
@@ -68,44 +103,19 @@ const addNewRow = () => {
 }
 
 const addNewCell = (newThoughtRow,item) => {
-  const arrayOfNeededItems = Object.keys(item).filter(key => key === 'thought' || key === 'timestamp').sort().reverse();
-  const timestampValueNumber = parseInt(item['timestamp']);
-  const newDate = new Date(timestampValueNumber);
+  const newDate = new Date(item.timestamp)
   const dateFormat = `${newDate.getDate()}/${newDate.getMonth() + 1}/${newDate.getFullYear()}`;
-  item['timestamp'] = dateFormat;
-  if(arrayOfNeededItems.length === 2) {
-    arrayOfNeededItems.forEach(element => {
-      newCell = document.createElement('td');
-      newCell.innerHTML = `${item[element]}`;
-      newThoughtRow.append(newCell);
-    })
-  } else if(arrayOfNeededItems[0] !== 'timestamp') {
-    arrayOfNeededItems.splice(0, 0, 'placeholder')
-    arrayOfNeededItems.forEach(element => {
-      if(item[element]) {
-        newCell = document.createElement('td');
-        newCell.innerHTML = `${item[element]}`;
-        newThoughtRow.append(newCell);
-      } else {
-        newCell = document.createElement('td');
-        newCell.innerHTML = dateFormat;
-        newThoughtRow.append(newCell);
-      }
-    })
-  } else if (arrayOfNeededItems[0] === 'timestamp') {
-    arrayOfNeededItems.splice(1, 0, 'placeholder')
-    arrayOfNeededItems.forEach(element => {
-      if(item[element]) {
-        newCell = document.createElement('td');
-        newCell.innerHTML = `${item[element]}`;
-        newThoughtRow.append(newCell);
-      } else {
-        newCell = document.createElement('td');
-        newCell.innerHTML = '';
-        newThoughtRow.append(newCell);
-      }
-    })
-  }
+
+  // create date cell
+  const newDateCell = document.createElement('td');
+  newDateCell.innerHTML = dateFormat;
+  newThoughtRow.append(newDateCell);
+
+  // create thought cell
+  const newThoughtCell = document.createElement('td');
+  newThoughtCell.innerHTML = item.thought;
+  newThoughtRow.append(newThoughtCell);
+
   createActionCell(newThoughtRow);
 }
 
@@ -128,31 +138,4 @@ const clearText = () => {
   textArea.value.length = 0;
 }
 
-const sortByDate = () => {
-  const mappedArray = thoughtObjects.map(item => {
-    return item.timestamp;
-  })
-  console.log(mappedArray.sort());
-} 
 
-const init = () => {
-  
-  fetchThoughts();
-  textArea.addEventListener('keyup', () => {
-    const amountOfCharacters = countCharacters();
-    updateCharacterCount(amountOfCharacters);
-    enableDisableButtons(amountOfCharacters);
-  });
-
-  clearButton.addEventListener('click', () => {
-    clearText();
-    const amountOfCharacters = countCharacters();
-    updateCharacterCount(amountOfCharacters);
-    enableDisableButtons(amountOfCharacters);
-  });
-
-  submitButton.addEventListener('click', () => saveThought(textArea.value));
-  sortDateButton.addEventListener('click', sortByDate);
-}
-
-window.onload = init;
