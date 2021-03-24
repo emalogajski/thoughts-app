@@ -8,8 +8,6 @@ const characterCounter = document.getElementById('current');
 const textArea = document.getElementById('textarea');
 const tableBody = document.getElementById('table-body');
 
-
-let newCell;
 let td;
 let textArea;
 const thoughtObjects = [];
@@ -26,6 +24,7 @@ const fetchThoughts = async () => {
     console.error(err);
   }
 };
+
 const init = () => {
   textArea = document.getElementById("textarea");
   tableBody = document.getElementById("table-body");
