@@ -10,7 +10,7 @@ let textArea;
 const thoughtObjects = [];
 
 const fetchThoughts = async () => {
-  newThoughtRow = document.createElement('tr');
+
   try {
     const response = await axios.get(`${basePath}/thoughts`);
     
@@ -23,8 +23,11 @@ const fetchThoughts = async () => {
 };
 const init = () => {
   textArea = document.getElementById("textarea");
+  tableBody = document.getElementById("table-body");
   fetchThoughts();
   document.getElementById("submitInput").addEventListener("click", onSubmit);
+  document.getElementById("clearInput").addEventListener("click", onClear);
+
   textArea.addEventListener('keyup', countCharacters);
 }
 
@@ -33,27 +36,29 @@ window.onload = init;
 const renderTable = () => {
   emptyTable();
   thoughtObjects.forEach(item => {
-    addNewRow(),
-    addNewCell(item);
+    const row = addNewRow();
+    addNewCell(row,item);
   });
+}
+
+const onClear = () => {
+  textArea.value = "";
 }
 
 const onSubmit = async () => {
   const thought = textArea.value;
 
-  const newThought = await axios.post(`${basePath}/thoughts`, {thought});
+  const {data: newThought} = await axios.post(`${basePath}/thoughts`, {thought});
+  onClear();
   thoughtObjects.unshift(newThought)
   renderTable();
 }
 
 const emptyTable = () => {
-  currentRows = document.getElementsByClassName('thought-row');
-  for(let i = 0; i < currentRows.length; i++) {
-    currentRows[i].innerHTML = '';
-  }
+  tableBody.innerHTML = "";
 }
 
-const createActionCell = (element) => {
+const createActionCell = (row) => {
   td = document.createElement('td');
 
   //create span that holds Trash symbol and attach to cell
@@ -71,7 +76,7 @@ const createActionCell = (element) => {
   iEdit.classList.add('fas', 'fa-edit');
   spanEdit.appendChild(iEdit);
   td.appendChild(spanEdit);
-  element.append(td);
+  row.append(td);
 }
 
 const addNewRow = () => {
@@ -81,44 +86,19 @@ const addNewRow = () => {
 }
 
 const addNewCell = (newThoughtRow,item) => {
-  const arrayOfNeededItems = Object.keys(item).filter(key => key === 'thought' || key === 'timestamp').sort().reverse();
-  const timestampValueNumber = parseInt(item['timestamp']);
-  const newDate = new Date(timestampValueNumber);
+  const newDate = new Date(item.timestamp)
   const dateFormat = `${newDate.getDate()}/${newDate.getMonth() + 1}/${newDate.getFullYear()}`;
-  item['timestamp'] = dateFormat;
-  if(arrayOfNeededItems.length === 2) {
-    arrayOfNeededItems.forEach(element => {
-      newCell = document.createElement('td');
-      newCell.innerHTML = `${item[element]}`;
-      newThoughtRow.append(newCell);
-    })
-  } else if(arrayOfNeededItems[0] !== 'timestamp') {
-    arrayOfNeededItems.splice(0, 0, 'placeholder')
-    arrayOfNeededItems.forEach(element => {
-      if(item[element]) {
-        newCell = document.createElement('td');
-        newCell.innerHTML = `${item[element]}`;
-        newThoughtRow.append(newCell);
-      } else {
-        newCell = document.createElement('td');
-        newCell.innerHTML = dateFormat;
-        newThoughtRow.append(newCell);
-      }
-    })
-  } else if (arrayOfNeededItems[0] === 'timestamp') {
-    arrayOfNeededItems.splice(1, 0, 'placeholder')
-    arrayOfNeededItems.forEach(element => {
-      if(item[element]) {
-        newCell = document.createElement('td');
-        newCell.innerHTML = `${item[element]}`;
-        newThoughtRow.append(newCell);
-      } else {
-        newCell = document.createElement('td');
-        newCell.innerHTML = '';
-        newThoughtRow.append(newCell);
-      }
-    })
-  }
+
+  // create date cell
+  const newDateCell = document.createElement('td');
+  newDateCell.innerHTML = dateFormat;
+  newThoughtRow.append(newDateCell);
+
+  // create thought cell
+  const newThoughtCell = document.createElement('td');
+  newThoughtCell.innerHTML = item.thought;
+  newThoughtRow.append(newThoughtCell);
+
   createActionCell(newThoughtRow);
 }
 
