@@ -11,10 +11,13 @@ const sortDateButton = document.getElementById('sort-date-button');
 
 let newCell;
 let td;
+const thoughtObjects = [];
 
 const fetchThoughts = async () => {
   try {
     const response = await axios.get(`${basePath}/thoughts`);
+    thoughtObjects.length = 0;
+    thoughtObjects.push(...response.data);
     tableBody.innerHTML = '';
     response.data.forEach(item => {
       const row = addNewRow();
@@ -125,25 +128,12 @@ const clearText = () => {
   textArea.value.length = 0;
 }
 
-const sortByDate = async () => {
-  const arrayOfDateKeys = [];
-  const arrayOfObjectsSortedByDate = [];
-  try {
-    const response = await axios.get(`${basePath}/thoughts`);
-    response.data.map(item => {
-      const dateKey = Object.keys(item).filter(key => key === 'timestamp').map(key => item[key]);
-      const dateKeyFormatted = parseInt(dateKey);
-      arrayOfDateKeys.push(dateKeyFormatted);
-      const arrayOfDateKeysSorted = arrayOfDateKeys.sort();
-      arrayOfObjectsSortedByDate.push(item[arrayOfDateKeysSorted]);
-    })
-  } catch (err) {
-    console.error(err);
-  }
-  // const arrayOfDateKeysSorted = arrayOfDateKeys.sort();
-  // arrayOfObjectsSortedByDate.push(item[arrayOfObjectsSortedByDate]);
-  console.log(arrayOfObjectsSortedByDate);  
-}
+const sortByDate = () => {
+  const mappedArray = thoughtObjects.map(item => {
+    return item.timestamp;
+  })
+  console.log(mappedArray.sort());
+} 
 
 const init = () => {
   
@@ -162,12 +152,7 @@ const init = () => {
   });
 
   submitButton.addEventListener('click', () => saveThought(textArea.value));
-  sortDateButton.addEventListener('click', 
-  // () => {
-    sortByDate);
-    // tableBody.innerHTML = '';
-
-  // });
+  sortDateButton.addEventListener('click', sortByDate);
 }
 
 window.onload = init;
