@@ -13,3 +13,57 @@ button {
     fill:  #222;
   }
 }
+
+.sorting-button {
+  position: relative;
+  border: none;
+  font-weight: bold;
+  background-color: transparent;
+}
+
+.arrow-image {
+  position: absolute;
+  top: 9px;
+  right: 3px;
+  height: 12px;
+}
+
+.thought > img {
+  right: -12px;
+  background-image: red;
+}
+
+.sorting-button:hover {
+  color: #007bff;
+}
+
+.self-made-arrow-down:hover {
+  border-top: 8px solid #007bff;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+}
+
+.self-made-arrow-down {
+  display: inline-block;
+  border-top: 8px solid black;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  height: 0px;
+  width: 0px;
+  margin-left: 6px;
+}
+
+.self-made-arrow-up {
+  display: inline-block;
+  border-bottom: 8px solid #007bff;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  height: 0px;
+  width: 0px;
+  margin-left: 6px;
+}
+
+.both-arrows-wrapper {
+  display: flex;
+  flex-direction: column;
+}
