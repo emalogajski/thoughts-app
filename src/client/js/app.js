@@ -7,17 +7,12 @@ const submitButton = document.getElementById('submitInput');
 const characterCounter = document.getElementById('current');
 const textArea = document.getElementById('textarea');
 const tableBody = document.getElementById('table-body');
-
 const sortDateButton = document.getElementById('sort-date-button');
 
-let newCell;
 let td;
-<<<<<<< HEAD
-let textArea;
 const thoughtObjects = [];
 
 const fetchThoughts = async () => {
-
   try {
     const response = await axios.get(`${basePath}/thoughts`);
     
@@ -28,44 +23,38 @@ const fetchThoughts = async () => {
     console.error(err);
   }
 };
-=======
-const thoughtObjects = [];
->>>>>>> wip sortByDate function
 
-const init = () => {
-  textArea = document.getElementById("textarea");
-  tableBody = document.getElementById("table-body");
-  fetchThoughts();
-  document.getElementById("submitInput").addEventListener("click", onSubmit);
-  document.getElementById("clearInput").addEventListener("click", onClear);
-
-  textArea.addEventListener('keyup', countCharacters);
-  
-  const saveThought = async (thought) => {
-    try {
-      await axios.post(`${basePath}/thoughts`, {thought});
-      clearText();
-      const amountOfCharacters = countCharacters();
-      updateCharacterCount(amountOfCharacters);
-      enableDisableButtons(amountOfCharacters);
-    } catch (err) {
-      console.error(err);
-    }
-const fetchThoughts = async () => {
+const saveThought = async (thought) => {
   try {
-    const response = await axios.get(`${basePath}/thoughts`);
-    thoughtObjects.length = 0;
-    thoughtObjects.push(...response.data);
-    tableBody.innerHTML = '';
-    response.data.forEach(item => {
-      const row = addNewRow();
-      addNewCell(row, item);
-    })
+    await axios.post(`${basePath}/thoughts`, {thought});
+    clearText();
+    const amountOfCharacters = countCharacters();
+    updateCharacterCount(amountOfCharacters);
+    enableDisableButtons(amountOfCharacters);
   } catch (err) {
     console.error(err);
   }
-};
+}
 
+const init = () => {
+  
+  fetchThoughts();
+  textArea.addEventListener('keyup', () => {
+    const amountOfCharacters = countCharacters();
+    updateCharacterCount(amountOfCharacters);
+    enableDisableButtons(amountOfCharacters);
+  });
+
+  clearButton.addEventListener('click', () => {
+    clearText();
+    const amountOfCharacters = countCharacters();
+    updateCharacterCount(amountOfCharacters);
+    enableDisableButtons(amountOfCharacters);
+  });
+
+  submitButton.addEventListener('click', () => saveThought(textArea.value));
+  sortDateButton.addEventListener('click', sortByDateDescending);
+  document.getElementById('submitInput').addEventListener('click', onSubmit);
 }
 
 window.onload = init;
@@ -96,19 +85,6 @@ const emptyTable = () => {
 }
 
 const createActionCell = (row) => {
-const saveThought = async (thought) => {
-  try {
-    await axios.post(`${basePath}/thoughts`, {thought});
-    clearText();
-    const amountOfCharacters = countCharacters();
-    updateCharacterCount(amountOfCharacters);
-    enableDisableButtons(amountOfCharacters);
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-const createActionCell = (element) => {
   td = document.createElement('td');
 
   //create span that holds Trash symbol and attach to cell
@@ -171,31 +147,24 @@ const clearText = () => {
   textArea.value.length = 0;
 }
 
-const sortByDate = () => {
-  const mappedArray = thoughtObjects.map(item => {
-    return item.timestamp;
-  })
-  console.log(mappedArray.sort());
-} 
-
-const init = () => {
-  
-  fetchThoughts();
-  textArea.addEventListener('keyup', () => {
-    const amountOfCharacters = countCharacters();
-    updateCharacterCount(amountOfCharacters);
-    enableDisableButtons(amountOfCharacters);
+const sortByDateAscending = () => {
+  const sortedArray = thoughtObjects.sort(function (a, b) {
+    return a.timestamp - b.timestamp;
   });
-
-  clearButton.addEventListener('click', () => {
-    clearText();
-    const amountOfCharacters = countCharacters();
-    updateCharacterCount(amountOfCharacters);
-    enableDisableButtons(amountOfCharacters);
+  emptyTable();
+  sortedArray.forEach(item => {
+    const row = addNewRow();
+    addNewCell(row,item);
   });
-
-  submitButton.addEventListener('click', () => saveThought(textArea.value));
-  sortDateButton.addEventListener('click', sortByDate);
 }
 
-window.onload = init;
+const sortByDateDescending = () => {
+  const sortedArray = thoughtObjects.sort(function (a, b) {
+    return b.timestamp - a.timestamp;
+  });
+  emptyTable();
+  sortedArray.forEach(item => {
+    const row = addNewRow();
+    addNewCell(row,item);
+  });
+}
