@@ -7,7 +7,7 @@
         <title>Thoughts...</title>
         <meta content="width=device-width, initial-scale=1" name="viewport" />
         <meta charset="utf-8">
-        <script defer src="/node_modules/@fortawesome/fontawesome-free/js/all.min.js"></script>
+        <script defer src="/node_modules/@fortawesome/fontawesome-free/js/all.min.js" ></script>
         <script defer src="/node_modules/@fortawesome/fontawesome-free/js/fontawesome.min.js"></script>
     </header>
     <body>
@@ -37,10 +37,11 @@
                             <thead>
                                 <tr>
                                     <th><button id="sort-date-button" class="sorting-button">Date
-                                        <div class="self-made-arrow-down"></div></button>
+                                        <i id="sorting-image-for-date" class="fas fa-sort"></i></button>
                                     </th>
-                                    <th><button class="sorting-button thought">Thought
-                                    </button></th>
+                                    <th><button id="sort-thoughts-button" class="sorting-button thought">Thought
+                                        <i id="sorting-image-for-thoughts" class="fas fa-sort"></i></button>
+                                    </th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>

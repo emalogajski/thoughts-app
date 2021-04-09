@@ -64,6 +64,10 @@ button {
 }
 
 .both-arrows-wrapper {
-  display: flex;
+  // display: flex;
   flex-direction: column;
+}
+
+.active {
+  color:  #007bff;
 }

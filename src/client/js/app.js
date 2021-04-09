@@ -8,6 +8,9 @@ const characterCounter = document.getElementById('current');
 const textArea = document.getElementById('textarea');
 const tableBody = document.getElementById('table-body');
 const sortDateButton = document.getElementById('sort-date-button');
+const sortThoughtsButton = document.getElementById('sort-thoughts-button');
+let sortingDateImage;
+let sortingThoughtsImage;
 
 let td;
 const thoughtObjects = [];
@@ -37,7 +40,6 @@ const saveThought = async (thought) => {
 }
 
 const init = () => {
-  
   fetchThoughts();
   textArea.addEventListener('keyup', () => {
     const amountOfCharacters = countCharacters();
@@ -53,8 +55,43 @@ const init = () => {
   });
 
   submitButton.addEventListener('click', () => saveThought(textArea.value));
-  sortDateButton.addEventListener('click', sortByDateDescending);
   document.getElementById('submitInput').addEventListener('click', onSubmit);
+  sortDateButton.addEventListener('click', () => {
+    sortingDateImage = document.getElementById('sorting-image-for-date');
+    sortDateButton.classList.add('active');
+    sortThoughtsButton.classList.remove('active');
+    if(sortingDateImage.classList.contains('fa-sort')) {
+      sortingDateImage.classList.remove('fa-sort');
+      sortingDateImage.classList.add('fa-sort-up');
+      sortByDateDescending();
+    } else if(sortingDateImage.classList.contains('fa-sort-up')) {
+      sortingDateImage.classList.remove('fa-sort-up');
+      sortingDateImage.classList.add('fa-sort-down');
+      sortByDateAscending();
+    } else if (sortingDateImage.classList.contains('fa-sort-down')){
+      sortingDateImage.classList.remove('fa-sort-down');
+      sortingDateImage.classList.add('fa-sort-up');
+      sortByDateDescending();
+    }
+  });
+  sortThoughtsButton.addEventListener('click', () => {
+    sortThoughtsButton.classList.add('active');
+    sortDateButton.classList.remove('active');
+    sortingThoughtsImage = document.getElementById('sorting-image-for-thoughts');
+    if(sortingThoughtsImage.classList.contains('fa-sort')) {
+      sortingThoughtsImage.classList.remove('fa-sort');
+      sortingThoughtsImage.classList.add('fa-sort-up');
+      sortByThoughtsDescending();
+    } else if(sortingThoughtsImage.classList.contains('fa-sort-up')) {
+      sortingThoughtsImage.classList.remove('fa-sort-up');
+      sortingThoughtsImage.classList.add('fa-sort-down');
+      sortByThoughtsAscending();
+    } else {
+      sortingThoughtsImage.classList.remove('fa-sort-down');
+      sortingThoughtsImage.classList.add('fa-sort-up');
+      sortByThoughtsAscending();
+    }
+  });
 }
 
 window.onload = init;
@@ -161,6 +198,42 @@ const sortByDateAscending = () => {
 const sortByDateDescending = () => {
   const sortedArray = thoughtObjects.sort(function (a, b) {
     return b.timestamp - a.timestamp;
+  });
+  emptyTable();
+  sortedArray.forEach(item => {
+    const row = addNewRow();
+    addNewCell(row,item);
+  });
+}
+
+const sortByThoughtsAscending = () => {
+  const sortedArray = thoughtObjects.sort(function(a, b) {
+    let thoughtA = a.thought.toUpperCase();
+    let thoughtB = b.thought.toUpperCase();
+    if(thoughtA < thoughtB) {
+      return -1;
+    } else if(thoughtA > thoughtB) {
+      return 1;
+    }
+    return 0;
+  });
+  emptyTable();
+  sortedArray.forEach(item => {
+    const row = addNewRow();
+    addNewCell(row,item);
+  });
+}
+
+const sortByThoughtsDescending = () => {
+  const sortedArray = thoughtObjects.sort(function(a, b) {
+    let thoughtA = a.thought.toUpperCase();
+    let thoughtB = b.thought.toUpperCase();
+    if(thoughtA < thoughtB) {
+      return 1;
+    } else if(thoughtA > thoughtB) {
+      return -1;
+    }
+    return 0;
   });
   emptyTable();
   sortedArray.forEach(item => {
