@@ -15,6 +15,29 @@ let sortingThoughtsImage;
 let td;
 const thoughtObjects = [];
 
+const DATE = "DATE";
+const THOUGHT = "THOUGHT"
+
+const sorting = {
+  type: DATE,
+  ascending: false
+}
+
+const sortTable = () => {
+  let sortingFunction;
+  switch (sorting.type){
+  case DATE:
+    sortingFunction = !sorting.ascending ? sortByDateDescending : sortByDateAscending;
+    break;
+  case THOUGHT:
+    sortingFunction = !sorting.ascending ? sortByThoughtsDescending : sortByThoughtsAscending;
+    break;
+  default:
+    sortingFunction = () => {};
+  }
+  sortingFunction();
+}
+
 const fetchThoughts = async () => {
   try {
     const response = await axios.get(`${basePath}/thoughts`);
@@ -56,48 +79,42 @@ const init = () => {
 
   submitButton.addEventListener('click', () => saveThought(textArea.value));
   document.getElementById('submitInput').addEventListener('click', onSubmit);
-  sortDateButton.addEventListener('click', () => {
-    sortingDateImage = document.getElementById('sorting-image-for-date');
-    sortDateButton.classList.add('active');
-    sortThoughtsButton.classList.remove('active');
-    if(sortingDateImage.classList.contains('fa-sort')) {
-      sortingDateImage.classList.remove('fa-sort');
-      sortingDateImage.classList.add('fa-sort-up');
-      sortByDateDescending();
-    } else if(sortingDateImage.classList.contains('fa-sort-up')) {
-      sortingDateImage.classList.remove('fa-sort-up');
-      sortingDateImage.classList.add('fa-sort-down');
-      sortByDateAscending();
-    } else if (sortingDateImage.classList.contains('fa-sort-down')){
-      sortingDateImage.classList.remove('fa-sort-down');
-      sortingDateImage.classList.add('fa-sort-up');
-      sortByDateDescending();
-    }
-  });
-  sortThoughtsButton.addEventListener('click', () => {
-    sortThoughtsButton.classList.add('active');
-    sortDateButton.classList.remove('active');
-    sortingThoughtsImage = document.getElementById('sorting-image-for-thoughts');
-    if(sortingThoughtsImage.classList.contains('fa-sort')) {
-      sortingThoughtsImage.classList.remove('fa-sort');
-      sortingThoughtsImage.classList.add('fa-sort-up');
-      sortByThoughtsDescending();
-    } else if(sortingThoughtsImage.classList.contains('fa-sort-up')) {
-      sortingThoughtsImage.classList.remove('fa-sort-up');
-      sortingThoughtsImage.classList.add('fa-sort-down');
-      sortByThoughtsAscending();
-    } else {
-      sortingThoughtsImage.classList.remove('fa-sort-down');
-      sortingThoughtsImage.classList.add('fa-sort-up');
-      sortByThoughtsAscending();
-    }
-  });
+
+  const onSortButtonClick = type => ascending => {
+    const didSwitchTypes = type !== sorting.type;
+    sorting.type = type;
+    sorting.ascending = didSwitchTypes ? true : ascending
+
+    updateSortingIndicators()
+    renderTable();
+  }
+
+  const onSortByDateClick = onSortButtonClick(DATE);
+  const onSortByThoughtClick = onSortButtonClick(THOUGHT);
+  
+  sortDateButton.addEventListener('click', () => onSortByDateClick(!sorting.ascending));
+  sortThoughtsButton.addEventListener('click', () => onSortByThoughtClick(!sorting.ascending));
+}
+
+const updateSortingIndicators = () =>{
+  sortDateButton.classList.toggle('active', sorting.type === DATE);
+  sortThoughtsButton.classList.toggle('active', sorting.type === THOUGHT);
+  
+  sortingDateImage = document.getElementById('sorting-image-for-date');
+  sortingThoughtsImage = document.getElementById('sorting-image-for-thoughts');
+
+  const activeIndicator = sorting.type === DATE ? sortingDateImage : sortingThoughtsImage;
+  const inactiveIndicator = sorting.type === THOUGHT ? sortingDateImage : sortingThoughtsImage;
+
+  inactiveIndicator.classList.value = "svg-inline--fa fa-sort fa-w-10";
+  activeIndicator.classList.value = `svg-inline--fa fa-sort-${sorting.ascending ? 'up' : 'down'} fa-w-10`;
 }
 
 window.onload = init;
 
 const renderTable = () => {
   emptyTable();
+  sortTable()
   thoughtObjects.forEach(item => {
     const row = addNewRow();
     addNewCell(row,item);
@@ -185,59 +202,32 @@ const clearText = () => {
 }
 
 const sortByDateAscending = () => {
-  const sortedArray = thoughtObjects.sort(function (a, b) {
+  thoughtObjects.sort(function (a, b) {
     return a.timestamp - b.timestamp;
-  });
-  emptyTable();
-  sortedArray.forEach(item => {
-    const row = addNewRow();
-    addNewCell(row,item);
   });
 }
 
 const sortByDateDescending = () => {
-  const sortedArray = thoughtObjects.sort(function (a, b) {
+  thoughtObjects.sort(function (a, b) {
     return b.timestamp - a.timestamp;
   });
-  emptyTable();
-  sortedArray.forEach(item => {
-    const row = addNewRow();
-    addNewCell(row,item);
-  });
+}
+
+const sortAscending = (a, b) => {
+  let thoughtA = a.thought.toUpperCase();
+  let thoughtB = b.thought.toUpperCase();
+  if(thoughtA < thoughtB) {
+    return -1;
+  } else if(thoughtA > thoughtB) {
+    return 1;
+  }
+  return 0;
 }
 
 const sortByThoughtsAscending = () => {
-  const sortedArray = thoughtObjects.sort(function(a, b) {
-    let thoughtA = a.thought.toUpperCase();
-    let thoughtB = b.thought.toUpperCase();
-    if(thoughtA < thoughtB) {
-      return -1;
-    } else if(thoughtA > thoughtB) {
-      return 1;
-    }
-    return 0;
-  });
-  emptyTable();
-  sortedArray.forEach(item => {
-    const row = addNewRow();
-    addNewCell(row,item);
-  });
+  thoughtObjects.sort(sortAscending);
 }
 
 const sortByThoughtsDescending = () => {
-  const sortedArray = thoughtObjects.sort(function(a, b) {
-    let thoughtA = a.thought.toUpperCase();
-    let thoughtB = b.thought.toUpperCase();
-    if(thoughtA < thoughtB) {
-      return 1;
-    } else if(thoughtA > thoughtB) {
-      return -1;
-    }
-    return 0;
-  });
-  emptyTable();
-  sortedArray.forEach(item => {
-    const row = addNewRow();
-    addNewCell(row,item);
-  });
+  thoughtObjects.sort((a,b) => sortAscending(b,a));
 }
